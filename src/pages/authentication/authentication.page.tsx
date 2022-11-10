@@ -1,11 +1,12 @@
-import React, {FormEvent} from 'react';
+import React from 'react';
 import './authentication.page.scss';
-import {LoginComponent} from "../../components/login/login.component";
+import {LoginComponent, LoginForm} from "../../components/login/login.component";
 import {RegisterComponent, RegisterForm} from "../../components/register/register.component";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
-    registerForm: RegisterForm
+    registerForm: RegisterForm,
+    loginForm: LoginForm
 };
 type AuthenticationProps = {};
 
@@ -21,19 +22,32 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
                 password: '',
                 confirmPassword: '',
                 email: ''
+            },
+            loginForm: {
+                email: '',
+                password: ''
             }
         };
     }
 
-    private handleLoginSubmit(event: FormEvent<HTMLFormElement>): void {
-        event.preventDefault();
+    private handleLoginSubmit(form: LoginForm): void {
+        this.setState({
+            loginForm: form
+        });
+
+        console.log(form);
+
+        // Call API to login
     }
 
     private handleRegisterSubmit(form: RegisterForm): void {
-        console.log(form);
         this.setState({
             registerForm: form
         });
+
+        console.log(form);
+
+        // Call API to register
     }
 
     private handleToggleForm() {
@@ -46,7 +60,8 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
 
     render() {
         const form = this.state.displayedForm === "login" ?
-            <LoginComponent onSubmit={(event) => this.handleLoginSubmit(event)}
+            <LoginComponent form={this.state.loginForm}
+                            onSubmit={(event) => this.handleLoginSubmit(event)}
                             onToggleForm={() => this.handleToggleForm()}/> :
             <RegisterComponent form={this.state.registerForm}
                                onSubmit={(event) => this.handleRegisterSubmit(event)}
