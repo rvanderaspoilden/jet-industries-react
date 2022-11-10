@@ -7,6 +7,7 @@ import {Helmet} from "react-helmet";
 import '@shoelace-style/shoelace/dist/themes/dark.css';
 import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
 import {BrowserRouter} from "react-router-dom";
+import {UserContextProvider} from "./contexts/user.context";
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/');
 
@@ -18,7 +19,9 @@ root.render(
             <html className="sl-theme-dark"/>
         </Helmet>
         <BrowserRouter>
-            <App/>
+            <UserContextProvider>
+                <App/>
+            </UserContextProvider>
         </BrowserRouter>
     </React.StrictMode>
 );
