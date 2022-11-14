@@ -1,16 +1,28 @@
 import React from 'react';
 import './App.scss';
 import {Route, Routes} from "react-router-dom";
-import {AuthenticationPage} from "./pages/authentication/authentication.page";
-import {AdminPage} from "./pages/admin/admin.page";
+import RoutesConfig, {routeConfig} from "./configs/routes.config";
+import ProtectedRoute from "./components/app-routes/protected-route.component";
 
 function App() {
+    const routes = RoutesConfig.map((route: routeConfig) => {
+        const element = route.needAuthentication ? (
+            <ProtectedRoute {...route}>
+                {route.element}
+            </ProtectedRoute>
+        ) : (route.element);
+
+        return (
+            <Route key={route.path}
+                   path={route.path}
+                   element={element}/>
+        );
+    });
+
     return (
         <div className="App">
             <Routes>
-                <Route path="/authentication" element={<AuthenticationPage/>}/>
-                <Route path="/admin" element={<AdminPage/>}/>
-                <Route path="*" element={<AuthenticationPage/>}/>
+                {routes}
             </Routes>
         </div>
     );

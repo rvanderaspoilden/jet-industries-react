@@ -2,15 +2,21 @@ import React from 'react';
 import './authentication.page.scss';
 import {LoginComponent, LoginForm} from "../../components/login/login.component";
 import {RegisterComponent, RegisterForm} from "../../components/register/register.component";
+import {AuthContext} from "../../contexts/auth.context";
+import {User} from "../../models/user.model";
+import {Navigate} from "react-router-dom";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
     registerForm: RegisterForm,
-    loginForm: LoginForm
+    loginForm: LoginForm,
+    isAuthenticated: boolean
 };
 type AuthenticationProps = {};
 
 export class AuthenticationPage extends React.Component<AuthenticationProps, AuthenticationState> {
+    static contextType = AuthContext;
+    context!: React.ContextType<typeof AuthContext>;
 
     constructor(props: AuthenticationProps) {
         super(props);
@@ -26,7 +32,8 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
             loginForm: {
                 email: '',
                 password: ''
-            }
+            },
+            isAuthenticated: false
         };
     }
 
@@ -35,9 +42,12 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
             loginForm: form
         });
 
-        console.log(form);
-
-        // Call API to login
+        this.context.signIn(form, (user: User) => {
+            console.log("AUTHENTICATED", user);
+            this.setState({
+                isAuthenticated: true
+            });
+        });
     }
 
     private handleRegisterSubmit(form: RegisterForm): void {
@@ -45,9 +55,13 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
             registerForm: form
         });
 
-        console.log(form);
+        this.context.signUp(form, (success: boolean) => {
+            console.log("REGISTRATION SUCCESS");
 
-        // Call API to register
+            this.setState({
+                displayedForm: "login"
+            });
+        });
     }
 
     private handleToggleForm() {
@@ -59,6 +73,12 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
     }
 
     render() {
+        if (this.state.isAuthenticated) {
+            return (
+                <Navigate to="/admin" replace={true}/>
+            );
+        }
+
         const form = this.state.displayedForm === "login" ?
             <LoginComponent form={this.state.loginForm}
                             onSubmit={(event) => this.handleLoginSubmit(event)}
