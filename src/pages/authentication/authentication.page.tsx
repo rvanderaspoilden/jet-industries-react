@@ -5,6 +5,7 @@ import {RegisterComponent, RegisterForm} from "../../components/register/registe
 import {AuthContext} from "../../contexts/auth.context";
 import {User} from "../../models/user.model";
 import {Navigate} from "react-router-dom";
+import {notify} from "../../services/toastr.service";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
@@ -43,10 +44,13 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
         });
 
         this.context.signIn(form, (user: User) => {
-            console.log("AUTHENTICATED", user);
+            notify(`Welcome ${user.firstName} ${user.lastName} !`, 'primary', 'broadcast-pin');
+
             this.setState({
                 isAuthenticated: true
             });
+        }, (error: string) => {
+            notify(error, 'danger', 'exclamation-octagon');
         });
     }
 
@@ -55,12 +59,14 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
             registerForm: form
         });
 
-        this.context.signUp(form, (success: boolean) => {
-            console.log("REGISTRATION SUCCESS");
+        this.context.signUp(form, () => {
+            notify("Registration success !", 'success');
 
             this.setState({
                 displayedForm: "login"
             });
+        }, (error: string) => {
+            notify(error, 'danger', 'exclamation-octagon');
         });
     }
 

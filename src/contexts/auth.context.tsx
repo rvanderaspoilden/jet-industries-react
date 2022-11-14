@@ -8,8 +8,8 @@ export const AuthContext = createContext<AuthContextType>(undefined);
 
 type AuthContextType = {
     user: User,
-    signIn: (form: LoginForm, callback: (user: User) => void) => void,
-    signUp: (form: RegisterForm, callback: (success: boolean) => void) => void,
+    signIn: (form: LoginForm, successCallback: (user: User) => void, errorCallback?: (message: string) => void) => void,
+    signUp: (form: RegisterForm, callback: VoidFunction, errorCallback?: (message: string) => void) => void,
     signOut: (callback: VoidFunction) => void,
 }
 
@@ -42,9 +42,9 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
             .then(res => console.log(res));*/
     };
 
-    const signUp = (form: RegisterForm, callback: (success: boolean) => void): void => {
-        authProviderMock.signUp((success: boolean) => {
-            callback(success);
+    const signUp = (form: RegisterForm, successCallback: VoidFunction, errorCallback: (error: string) => void): void => {
+        authProviderMock.signUp(() => {
+            successCallback();
         });
 
         /*const requestOptions: RequestInit = {
