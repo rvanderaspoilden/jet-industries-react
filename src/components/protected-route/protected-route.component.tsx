@@ -1,4 +1,4 @@
-import {Navigate, RouteProps} from "react-router-dom";
+import {Navigate, RouteProps, useLocation} from "react-router-dom";
 import React from "react";
 import {useAuth} from "../../contexts/auth.context";
 
@@ -8,11 +8,10 @@ type ProtectedRouteProps = RouteProps & {
 
 const ProtectedRoute = ({redirectPath, children}: ProtectedRouteProps): JSX.Element => {
     const auth = useAuth();
-
-    console.log("CHECK AUTHENT", auth.user);
+    const location = useLocation();
 
     if (!auth.user) {
-        return <Navigate to={redirectPath || '/authentication'} replace/>;
+        return <Navigate to={redirectPath || '/authentication'} state={{from: location}} replace/>;
     }
 
     return children as JSX.Element;

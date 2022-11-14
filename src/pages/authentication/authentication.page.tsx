@@ -4,18 +4,24 @@ import {LoginComponent, LoginForm} from "../../components/login/login.component"
 import {RegisterComponent, RegisterForm} from "../../components/register/register.component";
 import {AuthContext} from "../../contexts/auth.context";
 import {User} from "../../models/user.model";
-import {Navigate} from "react-router-dom";
+import {Location, Navigate, useLocation} from "react-router-dom";
 import {notify} from "../../services/toastr.service";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
     registerForm: RegisterForm,
     loginForm: LoginForm,
-    isAuthenticated: boolean
 };
-type AuthenticationProps = {};
+type AuthenticationProps = {
+    location: Location
+};
 
-export class AuthenticationPage extends React.Component<AuthenticationProps, AuthenticationState> {
+export const AuthenticationPage = (props: any) => {
+    const location = useLocation();
+    return <Main location={location} {...props} />
+}
+
+class Main extends React.Component<AuthenticationProps, AuthenticationState> {
     static contextType = AuthContext;
     context!: React.ContextType<typeof AuthContext>;
 
@@ -34,7 +40,6 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
                 email: '',
                 password: ''
             },
-            isAuthenticated: false
         };
     }
 
@@ -45,10 +50,6 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
 
         this.context.signIn(form, (user: User) => {
             notify(`Welcome ${user.firstName} ${user.lastName} !`, 'primary', 'broadcast-pin');
-
-            this.setState({
-                isAuthenticated: true
-            });
         }, (error: string) => {
             notify(error, 'danger', 'exclamation-octagon');
         });
@@ -79,9 +80,11 @@ export class AuthenticationPage extends React.Component<AuthenticationProps, Aut
     }
 
     render() {
-        if (this.state.isAuthenticated) {
+        const from = this.props.location.state?.from?.pathname || '/admin';
+
+        if (this.context.user) {
             return (
-                <Navigate to="/admin" replace={true}/>
+                <Navigate to={from} replace={true}/>
             );
         }
 

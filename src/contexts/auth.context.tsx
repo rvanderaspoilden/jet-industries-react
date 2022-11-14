@@ -22,11 +22,13 @@ export function useAuth() {
 }
 
 export function AuthContextProvider(props: AuthContextProviderProps) {
-    const [user, setUser] = useState(null);
+
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
 
     const signIn = (form: LoginForm, callback: (user: User) => void): void => {
         authProviderMock.signIn(form.email, form.password, (user: User) => {
             setUser(user);
+            localStorage.setItem("user", JSON.stringify(user));
             callback(user);
         });
 

@@ -1,6 +1,6 @@
-import {AuthenticationPage} from "../pages/authentication/authentication.page";
 import {AdminPage} from "../pages/admin/admin.page";
 import React from "react";
+import {AuthenticationPage} from "../pages/authentication/authentication.page";
 
 export type routeConfig = {
     path: string,

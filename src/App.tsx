@@ -2,7 +2,7 @@ import React from 'react';
 import './App.scss';
 import {Route, Routes} from "react-router-dom";
 import RoutesConfig, {routeConfig} from "./configs/routes.config";
-import ProtectedRoute from "./components/app-routes/protected-route.component";
+import ProtectedRoute from "./components/protected-route/protected-route.component";
 
 function App() {
     const routes = RoutesConfig.map((route: routeConfig) => {
