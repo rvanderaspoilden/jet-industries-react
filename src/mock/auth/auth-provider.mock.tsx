@@ -8,12 +8,12 @@ const authProviderMock = {
 
         setTimeout(() => {
             callback(UserMock)
-        }, 100); // Fake async
+        }, 2000); // Fake async
     },
     signUp(successCallback: VoidFunction) {
         this.isAuthenticated = true;
 
-        setTimeout(successCallback, 100); // Fake async
+        setTimeout(successCallback, 1000); // Fake async
     },
     signOut(callback: VoidFunction) {
         this.isAuthenticated = false;

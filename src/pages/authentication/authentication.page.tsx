@@ -7,6 +7,7 @@ import {User} from "../../models/user.model";
 import {Location, Navigate, useLocation} from "react-router-dom";
 import {notify} from "../../services/toastr.service";
 import UserService from "../../services/user.service";
+import {LoaderContextType, useLoader} from "../../contexts/loader.context";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
@@ -14,12 +15,14 @@ type AuthenticationState = {
     loginForm: LoginForm,
 };
 type AuthenticationProps = {
-    location: Location
+    location: Location,
+    loader: LoaderContextType
 };
 
 const AuthenticationPage = (props: any) => {
     const location = useLocation();
-    return <Main location={location} {...props} />
+    const loader = useLoader();
+    return <Main location={location} loader={loader} {...props} />
 }
 
 class Main extends React.Component<AuthenticationProps, AuthenticationState> {
@@ -49,9 +52,13 @@ class Main extends React.Component<AuthenticationProps, AuthenticationState> {
             loginForm: form
         });
 
+        this.props.loader.show();
+
         this.context.signIn(form, (user: User) => {
+            this.props.loader.hide();
             notify(`Welcome ${UserService.DisplayFullName(user)} !`, 'primary', 'broadcast-pin');
         }, (error: string) => {
+            this.props.loader.hide();
             notify(error, 'danger', 'exclamation-octagon');
         });
     }
@@ -61,13 +68,16 @@ class Main extends React.Component<AuthenticationProps, AuthenticationState> {
             registerForm: form
         });
 
-        this.context.signUp(form, () => {
-            notify("Registration success !", 'success');
+        this.props.loader.show();
 
+        this.context.signUp(form, () => {
+            this.props.loader.hide();
+            notify("Registration success !", 'success');
             this.setState({
                 displayedForm: "login"
             });
         }, (error: string) => {
+            this.props.loader.hide();
             notify(error, 'danger', 'exclamation-octagon');
         });
     }
