@@ -2,7 +2,7 @@ import React from 'react';
 import {SlTab, SlTabGroup, SlTabPanel} from "@shoelace-style/shoelace/dist/react";
 import {HeaderComponent} from "../../components/header/header.component";
 
-export class AdminPage extends React.Component {
+class AdminPage extends React.Component {
     render() {
         return (
             <>
@@ -28,3 +28,5 @@ export class AdminPage extends React.Component {
         );
     }
 }
+
+export default AdminPage;

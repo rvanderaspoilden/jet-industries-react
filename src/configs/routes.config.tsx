@@ -1,6 +1,7 @@
-import {AdminPage} from "../pages/admin/admin.page";
-import React from "react";
-import {AuthenticationPage} from "../pages/authentication/authentication.page";
+import React, {lazy} from "react";
+
+const AdminPage = lazy(() => import("../pages/admin/admin.page"));
+const AuthenticationPage = lazy(() => import("../pages/authentication/authentication.page"));
 
 export type routeConfig = {
     path: string,

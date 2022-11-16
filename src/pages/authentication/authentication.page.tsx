@@ -16,7 +16,7 @@ type AuthenticationProps = {
     location: Location
 };
 
-export const AuthenticationPage = (props: any) => {
+const AuthenticationPage = (props: any) => {
     const location = useLocation();
     return <Main location={location} {...props} />
 }
@@ -113,3 +113,5 @@ class Main extends React.Component<AuthenticationProps, AuthenticationState> {
         );
     }
 }
+
+export default AuthenticationPage;

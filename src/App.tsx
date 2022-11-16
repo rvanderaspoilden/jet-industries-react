@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import './App.scss';
 import {Route, Routes} from "react-router-dom";
 import RoutesConfig, {routeConfig} from "./configs/routes.config";
@@ -21,9 +21,11 @@ function App() {
 
     return (
         <div className="App">
-            <Routes>
-                {routes}
-            </Routes>
+            <Suspense fallback={<h1>Page is loading...</h1>}>
+                <Routes>
+                    {routes}
+                </Routes>
+            </Suspense>
         </div>
     );
 }
