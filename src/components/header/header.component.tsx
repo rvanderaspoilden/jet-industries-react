@@ -1,22 +1,44 @@
-import React from "react";
+import React, {useState} from "react";
 import './header.component.scss';
-import {SlAvatar} from "@shoelace-style/shoelace/dist/react";
+import {SlAvatar, SlDivider, SlIcon, SlMenu, SlMenuItem, SlMenuLabel} from "@shoelace-style/shoelace/dist/react";
+import {useAuth} from "../../contexts/auth.context";
+import {useNavigate} from "react-router-dom";
+import {notify} from "../../services/toastr.service";
+import UserService from "../../services/user.service";
 
 type HeaderProps = {
     title: string,
-    isConnected?: boolean
 };
 
 export const HeaderComponent = (props: HeaderProps) => {
-    let profile;
+    const auth = useAuth();
+    const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
 
-    if (props.isConnected) {
-        profile = (
-            <div className="profile">
-                <SlAvatar initials="RV" label="User avatar"/>
-            </div>
-        );
+    const handleLogout = () => {
+        const fullName = UserService.DisplayFullName(auth.user);
+
+        auth.signOut(() => {
+            notify(`Good bye ${fullName} !`, 'primary', 'broadcast-pin');
+            navigate("/authentication");
+        });
     }
+
+    const profile = (
+        <div className="profile">
+            <SlAvatar initials={UserService.DisplayInitials(auth.user)} label="User avatar" onClick={() => setMenuOpen(!menuOpen)}/>
+
+            <SlMenu className={`menu ${menuOpen ? "opened" : "closed"}`}>
+                <SlMenuLabel>Name: {UserService.DisplayFullName(auth.user)}</SlMenuLabel>
+                <SlMenuLabel>Role: {auth.user.role}</SlMenuLabel>
+                <SlDivider/>
+                <SlMenuItem value="logout" onClick={() => handleLogout()}>
+                    <SlIcon slot="prefix" name="power"/>
+                    Log out
+                </SlMenuItem>
+            </SlMenu>
+        </div>
+    );
 
     return (
         <div className="container">

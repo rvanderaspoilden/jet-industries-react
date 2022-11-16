@@ -64,6 +64,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
     const signOut = (callback: VoidFunction): void => {
         authProviderMock.signOut(() => {
             setUser(null);
+            localStorage.removeItem("user");
             callback();
         });
     };
