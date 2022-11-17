@@ -1,0 +1,7 @@
+.crew-member-view-container {
+  display: grid;
+  padding: 0 var(--sl-spacing-medium);
+  grid-gap: var(--sl-spacing-medium);
+  grid-template-columns: repeat(auto-fill, 250px);
+  justify-content: center;
+}

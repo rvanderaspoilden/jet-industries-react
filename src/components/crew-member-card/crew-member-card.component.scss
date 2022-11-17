@@ -1,0 +1,35 @@
+sl-card {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .full_name {
+      margin-right: 10px;
+    }
+  }
+
+  .skill {
+    display: flex;
+    align-items: center;
+
+    sl-icon {
+      margin-right: 10px;
+    }
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    sl-button {
+      display: flex;
+      align-items: center;
+
+      sl-icon {
+        margin-right: 10px;
+      }
+    }
+  }
+}
