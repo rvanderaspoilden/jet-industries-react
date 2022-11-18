@@ -1,4 +1,4 @@
-import {SlBadge, SlButton, SlCard, SlIcon} from "@shoelace-style/shoelace/dist/react";
+import {SlAvatar, SlBadge, SlButton, SlCard, SlIcon} from "@shoelace-style/shoelace/dist/react";
 import React from "react";
 import {CrewMember, CrewMemberStatus} from "../../models/crew-member.model";
 import './crew-member-card.component.scss';
@@ -25,9 +25,15 @@ export const CrewMemberCardComponent = ({crewMember, onDelete, onEdit}: PropsTyp
         }
     }
 
+    const picture = crewMember.picture ?
+        (<img src={crewMember.picture} alt="Picture of the crew member"/>) :
+        (<SlAvatar shape="rounded" label="No picture"/>);
+
     return (
-        <SlCard>
-            <img src={crewMember.picture} alt="Picture of the crew member" slot="image"/>
+        <SlCard className="crew-member-card-container">
+            <div slot="image" className="image-container">
+                {picture}
+            </div>
 
             <div slot="header" className="header">
                 <span className="full_name">{CrewMemberService.DisplayFullName(crewMember)}</span>

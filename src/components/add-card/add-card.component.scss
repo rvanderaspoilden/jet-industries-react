@@ -1,0 +1,40 @@
+.add-card-container {
+  cursor: pointer;
+
+  &:hover {
+    .content {
+      color: var(--sl-color-primary-400);
+    }
+
+    &::part(base) {
+      border-color: var(--sl-color-primary-400);
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--sl-color-neutral-300);
+    align-items: center;
+    font-weight: var(--sl-font-weight-bold);
+    position: relative;
+    bottom: 30px;
+    transition: all .3s ease;
+    text-transform: uppercase;
+
+    sl-icon {
+      font-size: 8em;
+    }
+  }
+
+  &::part(base) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-style: dashed;
+    transition: all .3s ease;
+  }
+}

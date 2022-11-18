@@ -1,4 +1,4 @@
-sl-card {
+.crew-member-card-container {
   .header {
     display: flex;
     justify-content: space-between;
@@ -7,6 +7,24 @@ sl-card {
     .full_name {
       margin-right: 10px;
     }
+  }
+
+  .image-container {
+    height: 250px;
+    border-bottom: solid var(--border-width) var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &::part(base) {
+    height: 100%;
   }
 
   .skill {

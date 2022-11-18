@@ -5,9 +5,9 @@ import {RegisterComponent, RegisterForm} from "../../components/register/registe
 import {AuthContext} from "../../contexts/auth.context";
 import {User} from "../../models/user.model";
 import {Location, Navigate, useLocation} from "react-router-dom";
-import {notify} from "../../services/toastr.service";
 import UserService from "../../services/user.service";
 import {LoaderContextType, useLoader} from "../../contexts/loader.context";
+import {NotificationService} from "../../services/toastr.service";
 
 type AuthenticationState = {
     displayedForm: 'register' | 'login',
@@ -56,10 +56,10 @@ class Main extends React.Component<AuthenticationProps, AuthenticationState> {
 
         this.context.signIn(form, (user: User) => {
             this.props.loader.hide();
-            notify(`Welcome ${UserService.DisplayFullName(user)} !`, 'primary', 'broadcast-pin');
+            NotificationService.notify(`Welcome ${UserService.DisplayFullName(user)} !`, 'primary', 'broadcast-pin');
         }, (error: string) => {
             this.props.loader.hide();
-            notify(error, 'danger', 'exclamation-octagon');
+            NotificationService.notify(error, 'danger', 'exclamation-octagon');
         });
     }
 
@@ -72,13 +72,13 @@ class Main extends React.Component<AuthenticationProps, AuthenticationState> {
 
         this.context.signUp(form, () => {
             this.props.loader.hide();
-            notify("Registration success !", 'success');
+            NotificationService.notify("Registration success !", 'success');
             this.setState({
                 displayedForm: "login"
             });
         }, (error: string) => {
             this.props.loader.hide();
-            notify(error, 'danger', 'exclamation-octagon');
+            NotificationService.notify(error, 'danger', 'exclamation-octagon');
         });
     }
 
