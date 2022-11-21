@@ -1,6 +1,6 @@
 import {SlAvatar, SlBadge, SlButton, SlCard, SlIcon} from "@shoelace-style/shoelace/dist/react";
 import React from "react";
-import {CrewMember, CrewMemberStatus} from "../../models/crew-member.model";
+import {CrewMember, CrewMemberStatus, Job} from "../../models/crew-member.model";
 import './crew-member-card.component.scss';
 import {CrewMemberService} from "../../services/crew-member.service";
 

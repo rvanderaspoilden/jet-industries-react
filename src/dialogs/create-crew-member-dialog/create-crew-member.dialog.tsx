@@ -31,8 +31,9 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
         }
     }, [props.isOpen])
 
-    const jobs = Object.keys(Job).map((job: string) => {
-        return (<SlMenuItem key={job} value={job}>{job}</SlMenuItem>);
+    const jobs = Object.keys(Job).map((key: string) => {
+        const value: Job = Job[key as keyof typeof Job];
+        return (<SlMenuItem key={key} value={value}>{value}</SlMenuItem>);
     });
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

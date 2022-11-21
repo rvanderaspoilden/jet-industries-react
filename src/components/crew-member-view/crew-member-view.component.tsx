@@ -7,17 +7,32 @@ import AddCardComponent from "../add-card/add-card.component";
 import CreateCrewMemberDialog from "../../dialogs/create-crew-member-dialog/create-crew-member.dialog";
 import {useLoader} from "../../contexts/loader.context";
 import {NotificationService} from "../../services/toastr.service";
+import ConfirmDialog, {ConfirmDialogProps} from "../../dialogs/confirm-dialog/confirm.dialog";
+import {CrewMemberService} from "../../services/crew-member.service";
+
+type DeleteDialogData = ConfirmDialogProps & {
+    crewMember?: CrewMember
+}
 
 export const CrewMemberViewComponent = () => {
     const [data, setData] = useState<CrewMember[]>(CrewMemberMock);
     const [addMemberDialogOpen, setAddMemberDialogOpen] = useState<boolean>(false);
+    const [confirmDialog, setConfirmDialog] = useState<DeleteDialogData>({
+        message: "Are you sure to delete this crew member ?",
+        label: "Delete a crew member",
+        isOpen: false
+    });
+
     const loader = useLoader();
 
-    const handleDelete = (crewMember: CrewMember): void => {
-        // TODO: Call API to delete this crewMember
-
-        const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
-        setData(dataFiltered);
+    const handleOpenDeleteConfirmDialog = (crewMember: CrewMember): void => {
+        setConfirmDialog({
+            ...confirmDialog,
+            message: (<>Are you sure to delete <b>{CrewMemberService.DisplayFullName(crewMember)}</b> ?</>),
+            deleteButtonLabel: "Yes, I am.",
+            isOpen: true,
+            crewMember
+        });
     }
 
     const handleEdit = (crewMember: CrewMember): void => {
@@ -40,8 +55,32 @@ export const CrewMemberViewComponent = () => {
         }, 1000);
     }
 
+    const handleDeleteCrewMember = (crewMember: CrewMember): void => {
+        // TODO: Call API to remove this crewMember
+
+        const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
+        setData(dataFiltered);
+
+        handleCloseConfirmDialog();
+    }
+
+    const handleCloseConfirmDialog = (): void => {
+        setConfirmDialog({
+            ...confirmDialog,
+            isOpen: false,
+            crewMember: null
+        });
+    }
+
     return (
         <div className="crew-member-view-container">
+            <ConfirmDialog onClose={() => handleCloseConfirmDialog()}
+                           onDelete={() => handleDeleteCrewMember(confirmDialog.crewMember)}
+                           deleteButtonLabel={confirmDialog.deleteButtonLabel}
+                           isOpen={confirmDialog.isOpen}
+                           label={confirmDialog.label}
+                           message={confirmDialog.message}/>
+
             <CreateCrewMemberDialog isOpen={addMemberDialogOpen}
                                     onCreate={(value: CrewMember) => handleAddCrewMember(value)}
                                     onClose={() => setAddMemberDialogOpen(false)}/>
@@ -53,7 +92,7 @@ export const CrewMemberViewComponent = () => {
                     return (
                         <CrewMemberCardComponent key={crewMember.uniqueId}
                                                  crewMember={crewMember}
-                                                 onDelete={() => handleDelete(crewMember)}
+                                                 onDelete={() => handleOpenDeleteConfirmDialog(crewMember)}
                                                  onEdit={() => handleEdit(crewMember)}
                         />
                     );
