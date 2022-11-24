@@ -1,5 +1,5 @@
 export interface CrewMember {
-    uniqueId: string;
+    crewMemberId: string;
     firstName: string;
     lastName: string;
     job: Job,

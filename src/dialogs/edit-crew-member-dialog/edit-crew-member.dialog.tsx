@@ -1,35 +1,40 @@
 import React, {FormEvent, useEffect, useRef, useState} from "react";
-import './create-crew-member.dialog.scss';
+import './edit-crew-member.dialog.scss';
 import {SlButton, SlDialog, SlIcon, SlInput, SlMenuItem, SlSelect} from "@shoelace-style/shoelace/dist/react";
-import {CrewMember, CrewMemberStatus, Job} from "../../models/crew-member.model";
+import {CrewMember, Job} from "../../models/crew-member.model";
 
-type CreateCrewMemberDialogProps = {
+type EditCrewMemberDialogProps = {
     isOpen: boolean,
+    crewMember: CrewMember,
     onClose: VoidFunction,
-    onCreate: (crewMember: CrewMember) => void
+    onEdit: (crewMember: CrewMember) => void
 }
 
-type CreateCrewMemberForm = {
+type EditCrewMemberForm = {
     firstname: string,
     lastname: string,
     job: Job
 }
 
-const DEFAULT_FORM_VALUES: CreateCrewMemberForm = {
-    job: null,
+const DEFAULT_FORM_VALUES: EditCrewMemberForm = {
+    firstname: '',
     lastname: '',
-    firstname: ''
-}
+    job: null,
+};
 
-const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
-    const [form, setForm] = useState<CreateCrewMemberForm>(DEFAULT_FORM_VALUES);
+const EditCrewMemberDialog = (props: EditCrewMemberDialogProps) => {
+    const [form, setForm] = useState<EditCrewMemberForm>(DEFAULT_FORM_VALUES);
     const dialogRef = useRef(null);
 
     useEffect(() => {
-        if (props.isOpen && form !== DEFAULT_FORM_VALUES) {
-            setForm(DEFAULT_FORM_VALUES);
+        if (props.isOpen) {
+            setForm({
+                firstname: props.crewMember.firstName,
+                lastname: props.crewMember.lastName,
+                job: props.crewMember.job,
+            });
         }
-    }, [props.isOpen])
+    }, [props.isOpen, props.crewMember])
 
     const jobs = Object.keys(Job).map((key: string) => {
         const value: Job = Job[key as keyof typeof Job];
@@ -38,10 +43,8 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        props.onCreate({
-            firstName: form.firstname,
-            lastName: form.lastname,
-            status: CrewMemberStatus.AVAILABLE,
+        props.onEdit({
+            ...props.crewMember,
             job: form.job
         } as CrewMember);
     }
@@ -64,20 +67,17 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
     }
 
     return (
-        <SlDialog ref={dialogRef} label="Create Crew Member Dialog" open={props.isOpen}
-                  onSlRequestClose={handleRequestClose} className="create-new-member-dialog">
-            <label slot="label">Create a crew member</label>
+        <SlDialog ref={dialogRef} label="Edit Crew Member Dialog" open={props.isOpen}
+                  onSlRequestClose={handleRequestClose} className="edit-new-member-dialog">
+            <label slot="label">Edit a crew member</label>
 
             <form onSubmit={(event) => handleSubmit(event)}>
                 <SlInput name="firstname"
                          value={form.firstname}
-                         onSlChange={(event: any) => handleValueChange(event)}
-                         placeholder="First name*"
-                         clearable required/>
+                         onSlChange={(event: any) => handleValueChange(event)} disabled/>
                 <SlInput name="lastname"
                          value={form.lastname}
-                         onSlChange={(event: any) => handleValueChange(event)} placeholder="Last name*"
-                         clearable required/>
+                         onSlChange={(event: any) => handleValueChange(event)} disabled/>
                 <SlSelect name="job"
                           value={form.job}
                           onSlChange={(event: any) => handleValueChange(event)} placeholder="Job*" required>
@@ -90,7 +90,7 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
                         Cancel
                     </SlButton>
                     <SlButton type="submit" variant="primary">
-                        Create
+                        Edit
                     </SlButton>
                 </div>
             </form>
@@ -99,4 +99,4 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
     );
 }
 
-export default CreateCrewMemberDialog;
+export default EditCrewMemberDialog;

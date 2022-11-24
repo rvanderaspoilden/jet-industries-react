@@ -9,14 +9,25 @@ import {useLoader} from "../../contexts/loader.context";
 import {NotificationService} from "../../services/toastr.service";
 import ConfirmDialog, {ConfirmDialogProps} from "../../dialogs/confirm-dialog/confirm.dialog";
 import {CrewMemberService} from "../../services/crew-member.service";
+import EditCrewMemberDialog from "../../dialogs/edit-crew-member-dialog/edit-crew-member.dialog";
 
 type DeleteDialogData = ConfirmDialogProps & {
+    crewMember?: CrewMember
+}
+
+type EditDialogData = {
+    isOpen: boolean,
     crewMember?: CrewMember
 }
 
 export const CrewMemberViewComponent = () => {
     const [data, setData] = useState<CrewMember[]>(CrewMemberMock);
     const [addMemberDialogOpen, setAddMemberDialogOpen] = useState<boolean>(false);
+
+    const [editMemberDialog, setEditMemberDialog] = useState<EditDialogData>({
+        isOpen: false,
+    });
+
     const [confirmDialog, setConfirmDialog] = useState<DeleteDialogData>({
         message: "Are you sure to delete this crew member ?",
         label: "Delete a crew member",
@@ -35,30 +46,58 @@ export const CrewMemberViewComponent = () => {
         });
     }
 
+    const handleOpenEditDialog = (crewMember: CrewMember): void => {
+        setEditMemberDialog({
+            isOpen: true,
+            crewMember
+        });
+    }
+
     const handleEdit = (crewMember: CrewMember): void => {
         // TODO: Call API to update this crewMember
 
-        const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
-        dataFiltered.push(crewMember);
-        setData(dataFiltered);
+        loader.show();
+        setTimeout(() => {
+            loader.hide();
+            const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
+            dataFiltered.push(crewMember);
+            setData(dataFiltered);
+            setEditMemberDialog({
+                isOpen: false,
+                crewMember: null
+            });
+            NotificationService.notify("Crew member updated !", "success");
+        }, 1000);
     }
 
     const handleAddCrewMember = (crewMember: CrewMember): void => {
         // TODO: Call API to add a new crewMember
+        fetch('http://localhost:8080/crew-members', {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(crewMember)
+        })
+            .then(res => res.json())
+            .then((crewMember: CrewMember) => {
+                console.log("New crewmember : ", crewMember);
+            });
 
-        loader.show();
+        /*loader.show();
         setTimeout(() => {
             loader.hide();
             setData([...data, crewMember]);
             setAddMemberDialogOpen(false);
             NotificationService.notify("New crew member created !", "success");
-        }, 1000);
+        }, 1000);*/
     }
 
     const handleDeleteCrewMember = (crewMember: CrewMember): void => {
         // TODO: Call API to remove this crewMember
 
-        const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
+        const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
         setData(dataFiltered);
 
         handleCloseConfirmDialog();
@@ -85,15 +124,20 @@ export const CrewMemberViewComponent = () => {
                                     onCreate={(value: CrewMember) => handleAddCrewMember(value)}
                                     onClose={() => setAddMemberDialogOpen(false)}/>
 
+            <EditCrewMemberDialog isOpen={editMemberDialog.isOpen}
+                                  crewMember={editMemberDialog.crewMember}
+                                  onEdit={(value: CrewMember) => handleEdit(value)}
+                                  onClose={() => setEditMemberDialog({isOpen: false})}/>
+
             <AddCardComponent label="Add crew member" onClick={() => setAddMemberDialogOpen(true)}/>
 
             {
                 data.map((crewMember: CrewMember) => {
                     return (
-                        <CrewMemberCardComponent key={crewMember.uniqueId}
+                        <CrewMemberCardComponent key={crewMember.crewMemberId}
                                                  crewMember={crewMember}
                                                  onDelete={() => handleOpenDeleteConfirmDialog(crewMember)}
-                                                 onEdit={() => handleEdit(crewMember)}
+                                                 onEdit={() => handleOpenEditDialog(crewMember)}
                         />
                     );
                 })
