@@ -36,7 +36,7 @@ export const CrewMemberCardComponent = ({crewMember, onDelete, onEdit}: PropsTyp
             </div>
 
             <div slot="header" className="header">
-                <span className="full_name">{CrewMemberService.DisplayFullName(crewMember)}</span>
+                <span className="full_name">{CrewMemberService.displayFullName(crewMember)}</span>
                 <SlBadge variant={convertStatusToVariant(crewMember.status)}>{crewMember.status}</SlBadge>
             </div>
 

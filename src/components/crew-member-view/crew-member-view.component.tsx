@@ -1,7 +1,6 @@
-import {CrewMemberMock} from "../../mock/crew-member/crew-member.mock";
 import {CrewMember} from "../../models/crew-member.model";
 import {CrewMemberCardComponent} from "../crew-member-card/crew-member-card.component";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './crew-member-view.component.scss';
 import AddCardComponent from "../add-card/add-card.component";
 import CreateCrewMemberDialog from "../../dialogs/create-crew-member-dialog/create-crew-member.dialog";
@@ -21,7 +20,14 @@ type EditDialogData = {
 }
 
 export const CrewMemberViewComponent = () => {
-    const [data, setData] = useState<CrewMember[]>(CrewMemberMock);
+    const crewMemberService = new CrewMemberService();
+
+    const [data, setData] = useState<CrewMember[]>([]);
+
+    useEffect(() => {
+        crewMemberService.retrieveAll().then((crewMembers: CrewMember[]) => setData(crewMembers));
+    }, []);
+
     const [addMemberDialogOpen, setAddMemberDialogOpen] = useState<boolean>(false);
 
     const [editMemberDialog, setEditMemberDialog] = useState<EditDialogData>({
@@ -39,7 +45,7 @@ export const CrewMemberViewComponent = () => {
     const handleOpenDeleteConfirmDialog = (crewMember: CrewMember): void => {
         setConfirmDialog({
             ...confirmDialog,
-            message: (<>Are you sure to delete <b>{CrewMemberService.DisplayFullName(crewMember)}</b> ?</>),
+            message: (<>Are you sure to delete <b>{CrewMemberService.displayFullName(crewMember)}</b> ?</>),
             deleteButtonLabel: "Yes, I am.",
             isOpen: true,
             crewMember
@@ -54,53 +60,43 @@ export const CrewMemberViewComponent = () => {
     }
 
     const handleEdit = (crewMember: CrewMember): void => {
-        // TODO: Call API to update this crewMember
-
         loader.show();
-        setTimeout(() => {
+
+        crewMemberService.update(crewMember).then((result: CrewMember) => {
             loader.hide();
-            const dataFiltered = data.filter(x => x.uniqueId !== crewMember.uniqueId);
-            dataFiltered.push(crewMember);
+            const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
+            dataFiltered.push(result);
             setData(dataFiltered);
             setEditMemberDialog({
                 isOpen: false,
                 crewMember: null
             });
             NotificationService.notify("Crew member updated !", "success");
-        }, 1000);
+        }).catch(() => NotificationService.notify("An occured during crew member updating...", "danger"))
     }
 
     const handleAddCrewMember = (crewMember: CrewMember): void => {
-        // TODO: Call API to add a new crewMember
-        fetch('http://localhost:8080/crew-members', {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(crewMember)
-        })
-            .then(res => res.json())
-            .then((crewMember: CrewMember) => {
-                console.log("New crewmember : ", crewMember);
-            });
+        loader.show();
 
-        /*loader.show();
-        setTimeout(() => {
-            loader.hide();
-            setData([...data, crewMember]);
-            setAddMemberDialogOpen(false);
-            NotificationService.notify("New crew member created !", "success");
-        }, 1000);*/
+        crewMemberService.create(crewMember)
+            .then((result: CrewMember) => {
+                setData([...data, result]);
+                setAddMemberDialogOpen(false);
+                NotificationService.notify("New crew member created !", "success");
+                loader.hide();
+            })
+            .catch(() => {
+                NotificationService.notify("An error occurred during creation...", "danger");
+                loader.hide()
+            });
     }
 
     const handleDeleteCrewMember = (crewMember: CrewMember): void => {
-        // TODO: Call API to remove this crewMember
-
-        const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
-        setData(dataFiltered);
-
-        handleCloseConfirmDialog();
+        crewMemberService.delete(crewMember.crewMemberId).then(() => {
+            const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
+            setData(dataFiltered);
+            handleCloseConfirmDialog();
+        });
     }
 
     const handleCloseConfirmDialog = (): void => {
