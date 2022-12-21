@@ -1,11 +1,14 @@
 import React, {FormEvent, useEffect, useRef, useState} from "react";
 import './edit-crew-member.dialog.scss';
 import {SlButton, SlDialog, SlIcon, SlInput, SlMenuItem, SlSelect} from "@shoelace-style/shoelace/dist/react";
-import {CrewMember, Job} from "../../models/crew-member.model";
+import {CrewMember} from "../../models/crew-member.model";
+import {Job} from "../../models/job.model";
+import {JobMock} from "../../mock/job/job.mock";
 
 type EditCrewMemberDialogProps = {
     isOpen: boolean,
     crewMember: CrewMember,
+    jobs: Job[],
     onClose: VoidFunction,
     onEdit: (crewMember: CrewMember) => void
 }
@@ -13,13 +16,15 @@ type EditCrewMemberDialogProps = {
 type EditCrewMemberForm = {
     firstname: string,
     lastname: string,
-    job: Job
+    picture: string,
+    jobId: string
 }
 
 const DEFAULT_FORM_VALUES: EditCrewMemberForm = {
     firstname: '',
     lastname: '',
-    job: null,
+    picture: '',
+    jobId: '',
 };
 
 const EditCrewMemberDialog = (props: EditCrewMemberDialogProps) => {
@@ -31,21 +36,22 @@ const EditCrewMemberDialog = (props: EditCrewMemberDialogProps) => {
             setForm({
                 firstname: props.crewMember.firstName,
                 lastname: props.crewMember.lastName,
-                job: props.crewMember.job,
+                jobId: props.crewMember.job.jobId,
+                picture: props.crewMember.picture
             });
         }
     }, [props.isOpen, props.crewMember])
 
-    const jobs = Object.keys(Job).map((key: string) => {
-        const value: Job = Job[key as keyof typeof Job];
-        return (<SlMenuItem key={key} value={value}>{value}</SlMenuItem>);
+    const jobList = props.jobs.map((job: Job) => {
+        return (<SlMenuItem key={job.jobId} value={job.jobId}>{job.label}</SlMenuItem>);
     });
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         props.onEdit({
             ...props.crewMember,
-            job: form.job
+            picture: form.picture,
+            job: props.jobs.find(x => x.jobId === form.jobId)
         } as CrewMember);
     }
 
@@ -78,11 +84,15 @@ const EditCrewMemberDialog = (props: EditCrewMemberDialogProps) => {
                 <SlInput name="lastname"
                          value={form.lastname}
                          onSlChange={(event: any) => handleValueChange(event)} disabled/>
-                <SlSelect name="job"
-                          value={form.job}
+                <SlInput name="picture"
+                         value={form.picture}
+                         onSlChange={(event: any) => handleValueChange(event)} placeholder="Picture (base64)"
+                         clearable/>
+                <SlSelect name="jobId"
+                          value={form.jobId}
                           onSlChange={(event: any) => handleValueChange(event)} placeholder="Job*" required>
                     <SlIcon name="mortarboard" slot="prefix"></SlIcon>
-                    {jobs}
+                    {jobList}
                 </SlSelect>
 
                 <div className="buttons">

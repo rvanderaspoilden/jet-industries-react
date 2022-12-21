@@ -1,5 +1,5 @@
 export class CrudService<Type> {
-    baseUri: string
+    baseUri: string;
 
     constructor(baseUri: string) {
         this.baseUri = baseUri;
@@ -12,17 +12,12 @@ export class CrudService<Type> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        })
-            .then(res => {
-                if (res.ok) {
-                    return res.json();
-                }
-                return Promise.reject(res);
-            })
-            .catch(error => {
-                console.error(error);
-                return [];
-            });
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(res);
+        });
     }
 
     retrieveOne<Type>(id: string): Promise<Type> {
@@ -56,18 +51,13 @@ export class CrudService<Type> {
         });
     }
 
-    delete<Type>(id: string): Promise<void> {
+    delete<Type>(id: string): Promise<Response> {
         return fetch(`${process.env.REACT_APP_API_URI}${this.baseUri}/${id}`, {
             method: "DELETE",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-        }).then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(res);
         });
     }
 

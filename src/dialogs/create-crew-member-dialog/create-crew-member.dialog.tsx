@@ -1,10 +1,14 @@
 import React, {FormEvent, useEffect, useRef, useState} from "react";
 import './create-crew-member.dialog.scss';
 import {SlButton, SlDialog, SlIcon, SlInput, SlMenuItem, SlSelect} from "@shoelace-style/shoelace/dist/react";
-import {CrewMember, CrewMemberStatus, Job} from "../../models/crew-member.model";
+import {CrewMember, CrewMemberStatus} from "../../models/crew-member.model";
+import {Job} from "../../models/job.model";
+import {JobService} from "../../services/job.service";
+import {NotificationService} from "../../services/toastr.service";
 
 type CreateCrewMemberDialogProps = {
     isOpen: boolean,
+    jobs: Job[],
     onClose: VoidFunction,
     onCreate: (crewMember: CrewMember) => void
 }
@@ -12,13 +16,15 @@ type CreateCrewMemberDialogProps = {
 type CreateCrewMemberForm = {
     firstname: string,
     lastname: string,
-    job: Job
+    jobId: string
+    picture: string,
 }
 
 const DEFAULT_FORM_VALUES: CreateCrewMemberForm = {
-    job: null,
+    jobId: '',
     lastname: '',
-    firstname: ''
+    firstname: '',
+    picture: ''
 }
 
 const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
@@ -26,15 +32,12 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
     const dialogRef = useRef(null);
 
     useEffect(() => {
-        if (props.isOpen && form !== DEFAULT_FORM_VALUES) {
-            setForm(DEFAULT_FORM_VALUES);
+        if (props.isOpen) {
+            if(form !== DEFAULT_FORM_VALUES) {
+                setForm(DEFAULT_FORM_VALUES);
+            }
         }
     }, [props.isOpen])
-
-    const jobs = Object.keys(Job).map((key: string) => {
-        const value: Job = Job[key as keyof typeof Job];
-        return (<SlMenuItem key={key} value={value}>{value}</SlMenuItem>);
-    });
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -42,7 +45,8 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
             firstName: form.firstname,
             lastName: form.lastname,
             status: CrewMemberStatus.AVAILABLE,
-            job: form.job
+            picture: form.picture,
+            job: props.jobs.find(x => x.jobId === form.jobId)
         } as CrewMember);
     }
 
@@ -63,6 +67,10 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
         }
     }
 
+    const jobList = props.jobs.map((job: Job) => {
+        return (<SlMenuItem key={job.jobId} value={job.jobId}>{job.label}</SlMenuItem>);
+    });
+
     return (
         <SlDialog ref={dialogRef} label="Create Crew Member Dialog" open={props.isOpen}
                   onSlRequestClose={handleRequestClose} className="create-new-member-dialog">
@@ -78,11 +86,15 @@ const CreateCrewMemberDialog = (props: CreateCrewMemberDialogProps) => {
                          value={form.lastname}
                          onSlChange={(event: any) => handleValueChange(event)} placeholder="Last name*"
                          clearable required/>
-                <SlSelect name="job"
-                          value={form.job}
+                <SlInput name="picture"
+                         value={form.picture}
+                         onSlChange={(event: any) => handleValueChange(event)} placeholder="Picture (base64)"
+                         clearable/>
+                <SlSelect name="jobId"
+                          value={form.jobId}
                           onSlChange={(event: any) => handleValueChange(event)} placeholder="Job*" required>
                     <SlIcon name="mortarboard" slot="prefix"></SlIcon>
-                    {jobs}
+                    {jobList}
                 </SlSelect>
 
                 <div className="buttons">

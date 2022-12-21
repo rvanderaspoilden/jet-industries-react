@@ -1,3 +1,5 @@
+import {Job} from "./job.model";
+
 export interface CrewMember {
     crewMemberId: string;
     firstName: string;
@@ -11,11 +13,4 @@ export enum CrewMemberStatus {
     AVAILABLE = "Available",
     ASSIGNED = "Assigned",
     INVALID = "Invalid"
-}
-
-export enum Job {
-    COOK = "Cook",
-    PILOT = "Pilot",
-    SOLDIER = "Soldier",
-    DOCTOR = "Doctor"
 }

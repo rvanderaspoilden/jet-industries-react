@@ -1,6 +1,6 @@
 import {SlAvatar, SlBadge, SlButton, SlCard, SlIcon} from "@shoelace-style/shoelace/dist/react";
 import React from "react";
-import {CrewMember, CrewMemberStatus, Job} from "../../models/crew-member.model";
+import {CrewMember, CrewMemberStatus} from "../../models/crew-member.model";
 import './crew-member-card.component.scss';
 import {CrewMemberService} from "../../services/crew-member.service";
 
@@ -11,6 +11,8 @@ type PropsType = {
 }
 
 export const CrewMemberCardComponent = ({crewMember, onDelete, onEdit}: PropsType) => {
+    const crewMemberService = new CrewMemberService();
+
     const convertStatusToVariant = (status: CrewMemberStatus) => {
         switch (status) {
             case CrewMemberStatus.ASSIGNED:
@@ -36,11 +38,11 @@ export const CrewMemberCardComponent = ({crewMember, onDelete, onEdit}: PropsTyp
             </div>
 
             <div slot="header" className="header">
-                <span className="full_name">{CrewMemberService.displayFullName(crewMember)}</span>
-                <SlBadge variant={convertStatusToVariant(crewMember.status)}>{crewMember.status}</SlBadge>
+                <span className="full_name">{crewMemberService.displayFullName(crewMember)}</span>
+                <SlBadge variant={convertStatusToVariant(crewMember.status)}>{crewMember.status || 'undefined'}</SlBadge>
             </div>
 
-            <div className="skill"><SlIcon name="mortarboard"/> {crewMember.job}</div>
+            <div className="skill"><SlIcon name="mortarboard"/> {crewMember.job?.label}</div>
 
             <div slot="footer" className="footer">
                 <SlButton variant="danger" outline onClick={onDelete}>

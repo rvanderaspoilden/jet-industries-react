@@ -7,8 +7,10 @@ import CreateCrewMemberDialog from "../../dialogs/create-crew-member-dialog/crea
 import {useLoader} from "../../contexts/loader.context";
 import {NotificationService} from "../../services/toastr.service";
 import ConfirmDialog, {ConfirmDialogProps} from "../../dialogs/confirm-dialog/confirm.dialog";
-import {CrewMemberService} from "../../services/crew-member.service";
 import EditCrewMemberDialog from "../../dialogs/edit-crew-member-dialog/edit-crew-member.dialog";
+import {CrewMemberService} from "../../services/crew-member.service";
+import {Job} from "../../models/job.model";
+import {JobService} from "../../services/job.service";
 
 type DeleteDialogData = ConfirmDialogProps & {
     crewMember?: CrewMember
@@ -21,11 +23,14 @@ type EditDialogData = {
 
 export const CrewMemberViewComponent = () => {
     const crewMemberService = new CrewMemberService();
+    const jobService = new JobService();
 
     const [data, setData] = useState<CrewMember[]>([]);
+    const [jobs, setJobs] = useState<Job[]>([]);
 
     useEffect(() => {
-        crewMemberService.retrieveAll().then((crewMembers: CrewMember[]) => setData(crewMembers));
+        retrieveAllJobs();
+        retrieveAllCrewMembers();
     }, []);
 
     const [addMemberDialogOpen, setAddMemberDialogOpen] = useState<boolean>(false);
@@ -42,10 +47,30 @@ export const CrewMemberViewComponent = () => {
 
     const loader = useLoader();
 
+    const retrieveAllCrewMembers = (): void => {
+        loader.show();
+
+        crewMemberService.retrieveAll()
+            .then((crewMembers: CrewMember[]) => {
+                setData(crewMembers);
+                loader.hide();
+            })
+            .catch(() => {
+                loader.hide();
+                NotificationService.notify("Cannot retrieve all crew members...", "danger");
+            });
+    }
+
+    const retrieveAllJobs = (): void => {
+        jobService.retrieveAll()
+            .then((result: Job[]) => setJobs(result))
+            .catch(() => NotificationService.notify("Cannot retrieve jobs...", "danger"));
+    }
+
     const handleOpenDeleteConfirmDialog = (crewMember: CrewMember): void => {
         setConfirmDialog({
             ...confirmDialog,
-            message: (<>Are you sure to delete <b>{CrewMemberService.displayFullName(crewMember)}</b> ?</>),
+            message: (<>Are you sure to delete <b>{crewMemberService.displayFullName(crewMember)}</b> ?</>),
             deleteButtonLabel: "Yes, I am.",
             isOpen: true,
             crewMember
@@ -92,10 +117,18 @@ export const CrewMemberViewComponent = () => {
     }
 
     const handleDeleteCrewMember = (crewMember: CrewMember): void => {
+        loader.show();
+
         crewMemberService.delete(crewMember.crewMemberId).then(() => {
+            loader.hide();
+            handleCloseConfirmDialog();
             const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
             setData(dataFiltered);
+            NotificationService.notify(`${crewMemberService.displayFullName(crewMember)} has been deleted`, 'success');
+        }).catch(() => {
+            loader.hide();
             handleCloseConfirmDialog();
+            NotificationService.notify("An error occurred during deletion...", 'danger');
         });
     }
 
@@ -117,10 +150,12 @@ export const CrewMemberViewComponent = () => {
                            message={confirmDialog.message}/>
 
             <CreateCrewMemberDialog isOpen={addMemberDialogOpen}
+                                    jobs={jobs}
                                     onCreate={(value: CrewMember) => handleAddCrewMember(value)}
                                     onClose={() => setAddMemberDialogOpen(false)}/>
 
             <EditCrewMemberDialog isOpen={editMemberDialog.isOpen}
+                                  jobs={jobs}
                                   crewMember={editMemberDialog.crewMember}
                                   onEdit={(value: CrewMember) => handleEdit(value)}
                                   onClose={() => setEditMemberDialog({isOpen: false})}/>

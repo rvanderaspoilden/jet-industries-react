@@ -6,7 +6,7 @@ export class CrewMemberService extends CrudService<CrewMember> {
         super("/crew-members");
     }
 
-    static displayFullName(crewMember: CrewMember): string {
+    displayFullName(crewMember: CrewMember): string {
         return `${crewMember.firstName} ${crewMember.lastName}`;
     }
 }
