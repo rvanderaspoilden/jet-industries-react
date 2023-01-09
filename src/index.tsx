@@ -9,8 +9,20 @@ import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextProvider} from "./contexts/auth.context";
 import {LoaderContextProvider} from "./contexts/loader.context";
+import axios from "axios";
+import {NotificationService} from "./services/toastr.service";
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/');
+
+axios.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+     if(error.response?.data?.error){
+        NotificationService.notify(error.response.data.error, 'danger');
+    } else {
+        NotificationService.notify(error.response.data, 'danger');
+    }
+})
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

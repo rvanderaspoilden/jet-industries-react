@@ -55,16 +55,11 @@ export const CrewMemberViewComponent = () => {
                 setData(crewMembers);
                 loader.hide();
             })
-            .catch(() => {
-                loader.hide();
-                NotificationService.notify("Cannot retrieve all crew members...", "danger");
-            });
+            .catch(() => loader.hide());
     }
 
     const retrieveAllJobs = (): void => {
-        jobService.retrieveAll()
-            .then((result: Job[]) => setJobs(result))
-            .catch(() => NotificationService.notify("Cannot retrieve jobs...", "danger"));
+        jobService.retrieveAll().then((result: Job[]) => setJobs(result));
     }
 
     const handleOpenDeleteConfirmDialog = (crewMember: CrewMember): void => {
@@ -87,7 +82,7 @@ export const CrewMemberViewComponent = () => {
     const handleEdit = (crewMember: CrewMember): void => {
         loader.show();
 
-        crewMemberService.update(crewMember).then((result: CrewMember) => {
+        crewMemberService.update(crewMember.crewMemberId, crewMember).then((result: CrewMember) => {
             loader.hide();
             const dataFiltered = data.filter(x => x.crewMemberId !== crewMember.crewMemberId);
             dataFiltered.push(result);
@@ -97,7 +92,7 @@ export const CrewMemberViewComponent = () => {
                 crewMember: null
             });
             NotificationService.notify("Crew member updated !", "success");
-        }).catch(() => NotificationService.notify("An occured during crew member updating...", "danger"))
+        });
     }
 
     const handleAddCrewMember = (crewMember: CrewMember): void => {
@@ -110,10 +105,7 @@ export const CrewMemberViewComponent = () => {
                 NotificationService.notify("New crew member created !", "success");
                 loader.hide();
             })
-            .catch(() => {
-                NotificationService.notify("An error occurred during creation...", "danger");
-                loader.hide()
-            });
+            .catch(() => loader.hide());
     }
 
     const handleDeleteCrewMember = (crewMember: CrewMember): void => {
@@ -128,7 +120,6 @@ export const CrewMemberViewComponent = () => {
         }).catch(() => {
             loader.hide();
             handleCloseConfirmDialog();
-            NotificationService.notify("An error occurred during deletion...", 'danger');
         });
     }
 
