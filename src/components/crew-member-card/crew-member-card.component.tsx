@@ -28,7 +28,7 @@ export const CrewMemberCardComponent = ({crewMember, onDelete, onEdit}: PropsTyp
     }
 
     const picture = crewMember.picture ?
-        (<img src={crewMember.picture} alt="Picture of the crew member"/>) :
+        (<img src={crewMember.picture} alt="the crew member"/>) :
         (<SlAvatar shape="rounded" label="No picture"/>);
 
     return (

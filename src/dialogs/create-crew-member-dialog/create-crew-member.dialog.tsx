@@ -3,8 +3,6 @@ import './create-crew-member.dialog.scss';
 import {SlButton, SlDialog, SlIcon, SlInput, SlMenuItem, SlSelect} from "@shoelace-style/shoelace/dist/react";
 import {CrewMember, CrewMemberStatus} from "../../models/crew-member.model";
 import {Job} from "../../models/job.model";
-import {JobService} from "../../services/job.service";
-import {NotificationService} from "../../services/toastr.service";
 
 type CreateCrewMemberDialogProps = {
     isOpen: boolean,
