@@ -3,7 +3,6 @@ import './edit-crew-member.dialog.scss';
 import {SlButton, SlDialog, SlIcon, SlInput, SlMenuItem, SlSelect} from "@shoelace-style/shoelace/dist/react";
 import {CrewMember} from "../../models/crew-member.model";
 import {Job} from "../../models/job.model";
-import {JobMock} from "../../mock/job/job.mock";
 
 type EditCrewMemberDialogProps = {
     isOpen: boolean,

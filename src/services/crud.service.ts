@@ -19,7 +19,7 @@ export class CrudService<Type> {
         return axios.post<Type>(`${process.env.REACT_APP_API_URI}${this.baseUri}`, body).then(res => res.data);
     }
 
-    delete<Type>(id: string): Promise<Response> {
+    delete(id: string): Promise<Response> {
         return axios.delete(`${process.env.REACT_APP_API_URI}${this.baseUri}/${id}`);
     }
 
